@@ -46,7 +46,7 @@ All files that are unpacked from the drive are then again custom formats, some e
 ```
 mha2.dat                    64b5d4902f7257241e2ebda1fe66aac4a0c381b9fcf87138c5ca0c99282d361f
 mha-vdrv-unpacker.exe       10f45529248662c06fc24e9d3970f3db877d481454b820f8cffe9336c7208744
-zlibd.dll                	1ccd8b5c23ebae6a88d05d8dab5012f9f3fe728b28eee0727b960d8af2ad4090
+zlibd.dll                   1ccd8b5c23ebae6a88d05d8dab5012f9f3fe728b28eee0727b960d8af2ad4090
 ```
 
 ## License
