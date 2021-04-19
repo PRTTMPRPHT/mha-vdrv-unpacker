@@ -1,5 +1,6 @@
 ﻿#include <iostream>
 #include <filesystem>
+#include <memory>
 
 #include "VDRV.h"
 #include "zlib.h"
@@ -30,10 +31,10 @@ void processFile(VDRV& vdrv, DriveMetadataEntry fileEntry, const string currentD
     
     // Estimate the length of the uncompressed data and create a new zlib compatible buffer.
     uLongf uncompressedLength = compressBound(fileEntry.getFileSize());
-    unsigned char* uncompressedBuf = new unsigned char[uncompressedLength];
+    unique_ptr<unsigned char[]> uncompressedBuf(new unsigned char[uncompressedLength]);
 
     // Zlib call. Stores the actual length of the uncompressed data back into uncompressed length.
-    uncompress(uncompressedBuf, &uncompressedLength, compressedBuf, fileEntry.getFileSize());
+    uncompress(&uncompressedBuf[0], &uncompressedLength, compressedBuf, fileEntry.getFileSize());
 
     cout << ", " << uncompressedLength << " B uncompressed" << endl;
 
@@ -42,7 +43,7 @@ void processFile(VDRV& vdrv, DriveMetadataEntry fileEntry, const string currentD
     if (binFile.is_open())
     {
         size_t len = fileEntry.getFileSize();
-        binFile.write(reinterpret_cast<char*>(uncompressedBuf), uncompressedLength);
+        binFile.write(reinterpret_cast<char*>(&uncompressedBuf[0]), uncompressedLength);
     }
 }
 
