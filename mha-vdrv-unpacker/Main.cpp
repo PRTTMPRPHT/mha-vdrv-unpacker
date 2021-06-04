@@ -29,14 +29,19 @@ void processFile(VDRV& vdrv, DriveMetadataEntry fileEntry, const string currentD
     unique_ptr<char[]> compressedFile = vdrv.readCompressedFile(fileEntry);
     unsigned char* compressedBuf = reinterpret_cast<unsigned char*>(&compressedFile[0]);
     
-    // Estimate the length of the uncompressed data and create a new zlib compatible buffer.
-    uLongf uncompressedLength = compressBound(fileEntry.getFileSize());
+    // Create a new zlib compatible buffer.
+    // Length is estimated by the original file size because the files never actually really got compressed, just converted to zlib format.
+    uLongf uncompressedLength = fileEntry.getFileSize();
     unique_ptr<unsigned char[]> uncompressedBuf(new unsigned char[uncompressedLength]);
 
-    // Zlib call. Stores the actual length of the uncompressed data back into uncompressed length.
-    uncompress(&uncompressedBuf[0], &uncompressedLength, compressedBuf, fileEntry.getFileSize());
+    // Zlib call. Stores the actual length of the uncompressed data back into uncompressed length. (should be the same for this file format)
+    const int decompressionSuccessful = uncompress(&uncompressedBuf[0], &uncompressedLength, compressedBuf, fileEntry.getFileSize());
 
     cout << ", " << uncompressedLength << " B uncompressed" << endl;
+
+    if (decompressionSuccessful != Z_OK) {
+        cout << "Error during decompression, buffer size might not have been enough. This shouldn't happen!" << endl;
+    }
 
     // Write out the uncompressed data.
     ofstream binFile(filePath, ios::out | ios::binary);
